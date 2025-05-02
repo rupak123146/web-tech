@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Car Booking Bill Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #ADD8E6; /* Light blue background color */
+      /* Remove the background image */
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    select, input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    #totalBill {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .breakdown {
+      margin-top: 10px;
+    }
+    .breakdown p {
+      margin: 5px 0;
+    }
+    .hidden {
+      display: none;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #resetBtn {
+      background-color: #f44336;
+    }
+    #resetBtn:hover {
+      background-color: #da190b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Car Booking Bill Calculator</h2>
+
+    <!-- Car Type Selection -->
+    <div class="input-group">
+      <label for="carType">Car Type</label>
+      <select id="carType">
+        <option value="0">Select a car</option>
+        <option value="50">Sedan - $50/day</option>
+        <option value="70">SUV - $70/day</option>
+        <option value="90">Luxury - $90/day</option>
+      </select>
+    </div>
+
+    <!-- Start and End Date Selection -->
+    <div class="input-group">
+      <label for="startDate">Rental Start Date</label>
+      <input type="date" id="startDate" />
+    </div>
+    <div class="input-group">
+      <label for="endDate">Rental End Date</label>
+      <input type="date" id="endDate" />
+    </div>
+
+    <!-- Insurance Selection -->
+    <div class="input-group">
+      <label for="insurance">Insurance</label>
+      <select id="insurance">
+        <option value="0">No Insurance</option>
+        <option value="20">Basic Insurance - $20/day</option>
+        <option value="40">Premium Insurance - $40/day</option>
+      </select>
+    </div>
+
+    <!-- Optional Service Selection (e.g., GPS, Child Seat, Extra Driver) -->
+    <div class="input-group">
+      <label for="gps">GPS Service</label>
+      <input type="checkbox" id="gps" /> Add GPS ($10/day)
+    </div>
+    <div class="input-group">
+      <label for="childSeat">Child Seat</label>
+      <input type="checkbox" id="childSeat" /> Add child seat ($5/day)
+    </div>
+    <div class="input-group">
+      <label for="extraDriver">Extra Driver</label>
+      <input type="checkbox" id="extraDriver" /> Add extra driver ($15/day)
+    </div>
+
+    <!-- Promo Code -->
+    <div class="input-group">
+      <label for="promoCode">Promo Code (optional)</label>
+      <input type="text" id="promoCode" placeholder="Enter promo code" />
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorMessage" class="error hidden">
+      <p>Please select a valid car type and rental dates before calculating.</p>
+    </div>
+
+    <!-- Calculate and Reset Buttons -->
+    <button id="calculateBtn">Calculate Total Bill</button>
+    <button id="resetBtn" class="hidden">Reset</button>
+
+    <!-- Total Bill and Breakdown -->
+    <div id="totalBill">
+      <p>Total Bill: $<span id="billAmount">0</span></p>
+    </div>
+    <div class="breakdown hidden" id="breakdown">
+      <p><strong>Breakdown:</strong></p>
+      <p id="carCost"></p>
+      <p id="insuranceCost"></p>
+      <p id="gpsCost"></p>
+      <p id="childSeatCost"></p>
+      <p id="extraDriverCost"></p>
+      <p id="discount"></p>
+      <p id="rentalPeriod"></p>
+    </div>
+  </div>
+
+  <script>
+    // Get references to the DOM elements
+    const carTypeSelect = document.getElementById('carType');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const insuranceSelect = document.getElementById('insurance');
+    const gpsCheckbox = document.getElementById('gps');
+    const childSeatCheckbox = document.getElementById('childSeat');
+    const extraDriverCheckbox = document.getElementById('extraDriver');
+    const promoCodeInput = document.getElementById('promoCode');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const billAmountSpan = document.getElementById('billAmount');
+    const breakdownDiv = document.getElementById('breakdown');
+    const carCostText = document.getElementById('carCost');
+    const insuranceCostText = document.getElementById('insuranceCost');
+    const gpsCostText = document.getElementById('gpsCost');
+    const childSeatCostText = document.getElementById('childSeatCost');
+    const extraDriverCostText = document.getElementById('extraDriverCost');
+    const discountText = document.getElementById('discount');
+    const rentalPeriodText = document.getElementById('rentalPeriod');
+    const errorMessageDiv = document.getElementById('errorMessage');
+
+    // Function to format currency
+    function formatCurrency(amount) {
+      return `$${amount.toFixed(2)}`;
+    }
+
+    // Function to calculate rental period in days
+    function calculateRentalDays(startDate, endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const timeDifference = end - start;
+      return Math.ceil(timeDifference / (1000 * 3600 * 24));
+    }
+
+    // Function to apply promo code discount
+    function applyPromoCode(total) {
+      const promoCode = promoCodeInput.value;
+      if (promoCode === "SUMMER10") {
+        return total * 0.90; // 10% discount
+      }
+      return total;
+    }
+
+    // Function to calculate the total bill
+    function calculateTotalBill() {
+      const carTypePrice = parseInt(carTypeSelect.value);
+      const startDate = startDateInput.value;
+      const endDate = endDateInput.value;
+      const insurancePrice = parseInt(insuranceSelect.value);
+      const gpsPrice = gpsCheckbox.checked ? 10 : 0;
+      const childSeatPrice = childSeatCheckbox.checked ? 5 : 0;
+      const extraDriverPrice = extraDriverCheckbox.checked ? 15 : 0;
+
+      // Validate inputs
+      if (carTypePrice <= 0 || !startDate || !endDate) {
+        errorMessageDiv.classList.remove('hidden');
+        breakdownDiv.classList.add('hidden');
+        return;
+      }
+
+      errorMessageDiv.classList.add('hidden');
+      const rentalDays = calculateRentalDays(startDate, endDate);
+
+      if (rentalDays <= 0) {
+        errorMessageDiv.classList.remove('hidden');
+        errorMessageDiv.textContent = "End date must be after the start date.";
+        breakdownDiv.classList.add('hidden');
+        return;
+      }
+
+      let total = (carTypePrice + insurancePrice + gpsPrice + childSeatPrice + extraDriverPrice) * rentalDays;
+
+      // Apply promo code discount
+      total = applyPromoCode(total);
+
+      // Apply rental duration discounts
+      let discount = 0;
+      if (rentalDays >= 30) {
+        discount = total * 0.20;
+      } else if (rentalDays >= 14) {
+        discount = total * 0.15;
+      } else if (rentalDays >= 7) {
+        discount = total * 0.10;
+      }
+
+      total -= discount;
+
+      // Display breakdown
+      carCostText.textContent = `Car rental: ${formatCurrency(carTypePrice * rentalDays)}`;
+      insuranceCostText.textContent = `Insurance: ${formatCurrency(insurancePrice * rentalDays)}`;
+      gpsCostText.textContent = gpsPrice > 0 ? `GPS Service: ${formatCurrency(gpsPrice * rentalDays)}` : "No GPS Service";
+      childSeatCostText.textContent = childSeatPrice > 0 ? `Child Seat: ${formatCurrency(childSeatPrice * rentalDays)}` : "No Child Seat";
+      extraDriverCostText.textContent = extraDriverPrice > 0 ? `Extra Driver: ${formatCurrency(extraDriverPrice * rentalDays)}` : "No Extra Driver";
+      discountText.textContent = discount > 0 ? `Discount: ${formatCurrency(discount)}` : "No discount applied";
+      rentalPeriodText.textContent = `Rental Period: ${rentalDays} day(s)`;
+
+      // Show total bill
+      billAmountSpan.textContent = formatCurrency(total);
+
+      // Show breakdown and total
+      breakdownDiv.classList.remove('hidden');
+      resetBtn.classList.remove('hidden');
+      calculateBtn.textContent = 'Recalculate';
+    }
+
+    // Reset the calculator
+    function resetCalculator() {
+      carTypeSelect.value = '0';
+      startDateInput.value = '';
+      endDateInput.value = '';
+      insuranceSelect.value = '0';
+      gpsCheckbox.checked = false;
+      childSeatCheckbox.checked = false;
+      extraDriverCheckbox.checked = false;
+      promoCodeInput.value = '';
+      billAmountSpan.textContent = formatCurrency(0);
+      breakdownDiv.classList.add('hidden');
+      resetBtn.classList.add('hidden');
+      calculateBtn.textContent = 'Calculate Total Bill';
+      errorMessageDiv.classList.add('hidden');
+    }
+
+    // Event listeners
+    calculateBtn.addEventListener('click', calculateTotalBill);
+    resetBtn.addEventListener('click', resetCalculator);
+
+    // Save data to localStorage
+    function saveDataToLocalStorage() {
+      const formData = {
+        carType: carTypeSelect.value,
+        startDate: startDateInput.value,
+        endDate: endDateInput.value,
+        insurance: insuranceSelect.value,
+        gps: gpsCheckbox.checked,
+        childSeat: childSeatCheckbox.checked,
+        extraDriver: extraDriverCheckbox.checked,
+        promoCode: promoCodeInput.value
+      };
+
+      localStorage.setItem('carBookingData', JSON.stringify(formData));
+    }
+
+    // Load data from localStorage
+    function loadDataFromLocalStorage() {
+      const savedData = localStorage.getItem('carBookingData');
+      if (savedData) {
+        const formData = JSON.parse(savedData);
+        carTypeSelect.value = formData.carType;
+        startDateInput.value = formData.startDate;
+        endDateInput.value = formData.endDate;
+        insuranceSelect.value = formData.insurance;
+        gpsCheckbox.checked = formData.gps;
+        childSeatCheckbox.checked = formData.childSeat;
+        extraDriverCheckbox.checked = formData.extraDriver;
+        promoCodeInput.value = formData.promoCode;
+      }
+    }
+
+    // Save data when calculate button is clicked
+    calculateBtn.addEventListener('click', saveDataToLocalStorage);
+  </script>
+</body>
+</html>

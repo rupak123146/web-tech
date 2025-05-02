@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e0f7fa; /* Light blue background for the entire page */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"], input[type="file"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 150px;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Focus styles for input fields */
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus, textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        #charCount {
+            font-size: 12px;
+            color: #555;
+        }
+
+        #successMessage {
+            color: green;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        #submitBtn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .password-strength {
+            font-size: 12px;
+            color: red;
+        }
+
+        .strength-bar {
+            height: 5px;
+            background-color: red;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <h2>Blog Post</h2>
+        <form id="blogForm" action="#" method="POST" onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="title">Blog Title:</label>
+                <input type="text" id="title" name="title">
+                <span class="error" id="titleError"></span>
+            </div>
+            <div class="form-group">
+                <label for="content">Content:</label>
+                <textarea id="content" name="content" oninput="updateCharacterCount()"></textarea>
+                <span class="error" id="contentError"></span>
+                <div id="charCount">0/500 characters</div> <!-- Character counter -->
+            </div>
+            <div class="form-group">
+                <label for="author">Author:</label>
+                <input type="text" id="author" name="author">
+                <span class="error" id="authorError"></span>
+            </div>
+            <div class="form-group">
+                <label for="email">Author Email:</label>
+                <input type="email" id="email" name="email" autocomplete="on">
+                <span class="error" id="emailError"></span>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+                <span class="error" id="phoneError"></span>
+            </div>
+            <div class="form-group">
+                <label for="password">Password (for admin):</label>
+                <input type="password" id="password" name="password" oninput="checkPasswordStrength()">
+                <span class="error" id="passwordError"></span>
+                <div class="password-strength">
+                    <div id="strengthBar" class="strength-bar"></div>
+                    <span id="passwordStrengthText"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="fileUpload">Upload Image:</label>
+                <input type="file" id="fileUpload" name="fileUpload" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="terms" name="terms">
+                    I agree to the <a href="#">Terms and Conditions</a>
+                </label>
+                <span class="error" id="termsError"></span>
+            </div>
+            <div>
+                <button type="submit" id="submitBtn" disabled>Submit Blog</button>
+                <button type="reset" id="resetBtn">Reset Form</button>
+            </div>
+        </form>
+        <div id="successMessage">Your blog has been successfully submitted!</div>
+    </div>
+
+    <script>
+        // Real-time validation for each field
+        document.getElementById('title').addEventListener('input', checkFormValidity);
+        document.getElementById('content').addEventListener('input', checkFormValidity);
+        document.getElementById('author').addEventListener('input', checkFormValidity);
+        document.getElementById('email').addEventListener('input', checkFormValidity);
+        document.getElementById('phone').addEventListener('input', checkFormValidity);
+        document.getElementById('password').addEventListener('input', checkFormValidity);
+        document.getElementById('terms').addEventListener('change', checkFormValidity);
+
+        function updateCharacterCount() {
+            var contentLength = document.getElementById('content').value.length;
+            document.getElementById('charCount').textContent = contentLength + "/500 characters";
+        }
+
+        function checkPasswordStrength() {
+            var password = document.getElementById('password').value;
+            var strength = document.getElementById('strengthBar');
+            var strengthText = document.getElementById('passwordStrengthText');
+            var regexWeak = /^(?=.*[a-z]).{6,}$/;
+            var regexMedium = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            var regexStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{10,}$/;
+
+            if (password.match(regexStrong)) {
+                strength.style.width = '100%';
+                strength.style.backgroundColor = 'green';
+                strengthText.textContent = 'Strong';
+                strengthText.style.color = 'green';
+            } else if (password.match(regexMedium)) {
+                strength.style.width = '70%';
+                strength.style.backgroundColor = 'orange';
+                strengthText.textContent = 'Medium';
+                strengthText.style.color = 'orange';
+            } else if (password.match(regexWeak)) {
+                strength.style.width = '40%';
+                strength.style.backgroundColor = 'red';
+                strengthText.textContent = 'Weak';
+                strengthText.style.color = 'red';
+            } else {
+                strength.style.width = '0';
+                strength.style.backgroundColor = 'red';
+                strengthText.textContent = '';
+            }
+        }
+
+        function validateForm() {
+            // Clear previous errors
+            document.getElementById('titleError').textContent = '';
+            document.getElementById('contentError').textContent = '';
+            document.getElementById('authorError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('phoneError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+            document.getElementById('termsError').textContent = '';
+
+            // Get form field values
+            var title = document.getElementById('title').value.trim();
+            var content = document.getElementById('content').value.trim();
+            var author = document.getElementById('author').value.trim();
+            var email = document.getElementById('email').value.trim();
+            var phone = document.getElementById('phone').value.trim();
+            var password = document.getElementById('password').value.trim();
+            var terms = document.getElementById('terms').checked;
+
+            var isValid = true;
+
+            // Validate the title
+            if (title === '') {
+                document.getElementById('titleError').textContent = 'Title is required!';
+                isValid = false;
+            }
+
+            // Validate content
+            if (content === '') {
+                document.getElementById('contentError').textContent = 'Content is required!';
+                isValid = false;
+            }
+
+            // Validate phone number
+            if (phone && !phone.match(/^\d{3}-\d{3}-\d{4}$/)) {
+                document.getElementById('phoneError').textContent = 'Phone number must be in the format xxx-xxx-xxxx';
+                isValid = false;
+            }
+
+            // Validate password
+            if (password && password.length < 6) {
+                document.getElementById('passwordError').textContent = 'Password must be at least 6 characters long';
+                isValid = false;
+            }
+
+            // Validate terms checkbox
+            if (!terms) {
+                document.getElementById('termsError').textContent = 'You must agree to the terms and conditions';
+                isValid = false;
+            }
+
+            // Enable submit button if the form is valid
+            if (isValid) {
+                document.getElementById('submitBtn').disabled = false;
+            }
+
+            return isValid;
+        }
+
+        function checkFormValidity() {
+            validateForm();
+        }
+    </script>
+
+</body>
+</html>

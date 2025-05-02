@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>My Blog</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        
+        body {
+            background-color: #c8e6c9; /* Light green color */
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+        }
+        .back-to-top:hover {
+            background-color: #0056b3;
+        }
+        .social-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        .social-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="bg-teal text-white text-center py-4">
+        <h1>My Blog</h1>
+        <p>Welcome to my personal blog, where I share my thoughts, ideas, and experiences.</p>
+    </header>
+
+    <nav class="bg-dark text-white py-2">
+        <div class="container text-center">
+            <a href="#home" class="mx-3">Home</a>
+            <a href="#about" class="mx-3">About</a>
+            <a href="#contact" class="mx-3">Contact</a>
+            <input type="text" class="form-control mt-2 w-25 mx-auto" placeholder="Search...">
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Featured Post -->
+                <div class="bg-teal text-white p-4 mb-4 rounded">
+                    <h2>Featured Post: Top 5 Web Development Tips</h2>
+                    <p>Read our curated list of top tips for web development that can help you boost your career and improve your skills.</p>
+                    <a href="#" class="text-white font-weight-bold">Read More</a>
+                </div>
+
+                <!-- Blog Post 1 -->
+                <div class="bg-white p-4 mb-4 rounded shadow-sm">
+                    <h2>My First Blog Post</h2>
+                    <p><strong>Published on:</strong> February 16, 2025</p>
+                    <div><strong>Tags:</strong> Web Development, HTML, CSS</div>
+                    <p>Welcome to my blog! This is my first post where I want to introduce myself and talk about my journey into blogging...</p>
+                    <a href="#" class="text-primary font-weight-bold">Read More</a>
+                    <div class="bg-light p-3 mt-4 rounded">
+                        <h4>About the Author</h4>
+                        <p>Hi! I'm John Doe, a passionate blogger who loves to write about web development, technology, and personal growth. Follow me on social media!</p>
+                    </div>
+                </div>
+
+                <!-- Blog Post 2 -->
+                <div class="bg-white p-4 mb-4 rounded shadow-sm">
+                    <h2>Learning HTML and CSS</h2>
+                    <p><strong>Published on:</strong> February 14, 2025</p>
+                    <div><strong>Tags:</strong> HTML, CSS, Web Design</div>
+                    <p>In this post, I'll discuss how learning HTML and CSS helped me get started with web development...</p>
+                    <a href="#" class="text-primary font-weight-bold">Read More</a>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination justify-content-center mb-4">
+                    <a href="#" class="btn btn-primary mx-2">← Previous</a>
+                    <a href="#" class="btn btn-primary mx-2">Next →</a>
+                </div>
+
+                <!-- Social Share Buttons -->
+                <div class="text-center mb-4">
+                    <p>Share this post:</p>
+                    <a href="#" class="social-btn">Facebook</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Instagram</a>
+                </div>
+
+                <!-- Comment Section -->
+                <div class="bg-light p-4 rounded mb-4">
+                    <h4>Leave a Comment:</h4>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="3" placeholder="Write your comment here..."></textarea>
+                    </div>
+                    <button class="btn btn-dark mt-3">Post Comment</button>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="bg-light p-4 mb-4 rounded">
+                    <h3 class="text-center">Recent Posts</h3>
+                    <ul class="list-unstyled">
+                        <li><a href="#">My First Blog Post</a></li>
+                        <li><a href="#">Learning HTML and CSS</a></li>
+                        <li><a href="#">Exploring JavaScript for Beginners</a></li>
+                        <li><a href="#">How to Stay Productive in 2025</a></li>
+                    </ul>
+
+                    <h3 class="text-center">Categories</h3>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Web Development</a></li>
+                        <li><a href="#">Lifestyle</a></li>
+                        <li><a href="#">Personal Growth</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top">↑</a>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2025 My Blog. All Rights Reserved.</p>
+        <p>
+            <a href="#" class="text-white">Facebook</a> |
+            <a href="#" class="text-white">Twitter</a> |
+            <a href="#" class="text-white">Instagram</a>
+        </p>
+    </footer>
+
+    <!-- Newsletter Subscription -->
+    <div class="bg-teal text-white text-center py-4">
+        <h3>Subscribe to Our Newsletter</h3>
+        <form action="#" method="POST">
+            <input type="email" class="form-control w-50 mx-auto" placeholder="Enter your email" required>
+            <button type="submit" class="btn btn-dark mt-3">Subscribe</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+
+</body>
+</html>
